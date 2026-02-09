@@ -4,9 +4,11 @@ LexExplain – Bail Decision Justification & Legal Boundary Compliance Bot
 """
 
 PROHIBITED_KEYWORDS = [
+    "will the accused get bail",
+    "will the accused get bailed",
     "will i get bail",
     "will get bail",
-    "chances",
+    "chances of bail",
     "predict",
     "outcome",
     "result",
