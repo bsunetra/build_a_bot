@@ -1,0 +1,118 @@
+body {
+    font-family: Georgia, "Times New Roman", serif;
+    background: #f4f6f8;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #1f3a5f;
+}
+
+.chat-box {
+    max-width: 800px;
+    height: 350px;
+    margin: auto;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.bot {
+    background: #eaf2f8;
+    border-left: 4px solid #1f618d;
+    padding: 10px;
+    margin-bottom: 10px;
+    white-space: pre-line;
+}
+
+.user {
+    background: #f9ebea;
+    border-right: 4px solid #922b21;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: right;
+}
+
+.input-area {
+    max-width: 800px;
+    margin: auto;
+    display: flex;
+    margin-top: 10px;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    background: #1f618d;
+    color: white;
+    border: none;
+}
+
+.boundary {
+    max-width: 800px;
+    margin: auto;
+    margin-top: 15px;
+    font-size: 13px;
+    color: #7b241c;
+}
+const API_URL = "http://127.0.0.1:5000/chat";
+
+function sendMessage() {
+    const input = document.getElementById("userInput");
+    const chatBox = document.getElementById("chatBox");
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    chatBox.innerHTML += `<div class="user">${message}</div>`;
+    input.value = "";
+
+    fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: message })
+    })
+    .then(res => res.json())
+    .then(data => {
+        chatBox.innerHTML += `<div class="bot">${data.response}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    })
+    .catch(() => {
+        chatBox.innerHTML += `<div class="bot">System error.</div>`;
+    });
+}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LexExplain Chatbot</title>
+  <link rel="stylesheet" href="css/chatbot.css">
+</head>
+<body>
+
+<h1>LexExplain – Bail Reasoning Chatbot</h1>
+
+<div class="chat-box" id="chatBox">
+  <div class="bot">
+    Hello. I explain bail reasoning using legal principles.
+    Please enter a Case ID.
+  </div>
+</div>
+
+<div class="input-area">
+  <input type="text" id="userInput" placeholder="Enter query or Case ID">
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<p class="boundary">
+  This system does not provide legal advice, predictions, or guilt assessment.
+</p>
+
+<script src="js/chatbot.js"></script>
+</body>
+</html>
