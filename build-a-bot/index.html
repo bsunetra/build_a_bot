@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LexExplain ⚖️ Bail Reasoning Bot</title>
+
+<style>
+:root {
+    --primary: #1f3a5f;
+    --secondary: #2e86c1;
+    --accent: #d4ac0d;
+    --danger: #c0392b;
+    --bg: #eef2f7;
+}
+
+body {
+    font-family: "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #e8f0ff, #fdfefe);
+    margin: 0;
+    padding: 30px;
+}
+
+.container {
+    max-width: 950px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
+
+h1 {
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.badges {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.badge {
+    display: inline-block;
+    background: #eef3f9;
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    margin: 5px;
+    border: 1px solid #d6e0ea;
+}
+
+textarea {
+    width: 100%;
+    height: 90px;
+    padding: 14px;
+    font-size: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: none;
+}
+
+select, button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 8px;
+}
+
+button {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+}
+
+.output {
+    margin-top: 30px;
+    padding: 25px;
+    border-radius: 10px;
+    background: #f9fafb;
+    border-left: 6px solid var(--secondary);
+    white-space: pre-line;
+    font-size: 14px;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.output.blocked {
+    background: #fdecea;
+    border-left-color: var(--danger);
+    color: var(--danger);
+}
+
+.notice {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #555;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>⚖️ LexExplain</h1>
+    <div class="subtitle">
+        Bail Decision Justification & Legal Explainability System
+    </div>
+
+    <div class="badges">
+        <div class="badge">📜 Statute-Based</div>
+        <div class="badge">⚖️ Neutral Reasoning</div>
+        <div class="badge">🔍 Explainable AI</div>
+        <div class="badge">🚫 No Predictions</div>
+    </div>
+
+    <textarea id="query" placeholder="Ask about bail reasoning (no predictions or advice)..."></textarea>
+
+    <select id="caseSelect">
+        <option value="1">Case 1 – Economic Offence</option>
+        <option value="2">Case 2 – Violent Offence</option>
+    </select>
+
+    <button onclick="sendQuery()">⚖️ Explain Bail Reasoning</button>
+
+    <div id="output" class="output" style="display:none;"></div>
+
+    <div class="notice">
+        This system does not provide legal advice, predict outcomes, or assess guilt or innocence.
+    </div>
+</div>
+
+<script>
+function sendQuery() {
+    const query = document.getElementById("query").value;
+    const caseId = document.getElementById("caseSelect").value;
+    const output = document.getElementById("output");
+
+    fetch("http://127.0.0.1:5000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            query: query,
+            case_id: caseId
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        output.style.display = "block";
+        output.classList.toggle("blocked", data.blocked);
+        output.textContent = data.response;
+    })
+    .catch(() => {
+        output.style.display = "block";
+        output.textContent = "Backend connection error.";
+    });
+}
+</script>
+
+</body>
+</html>
