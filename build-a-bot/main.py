@@ -1,6 +1,11 @@
 import json
 
-from boundary import boundary_check, boundary_refusal
+from boundary import (
+    boundary_check,
+    boundary_refusal,
+    boundary_violation_reason
+)
+
 from explainer import explain_bail
 
 from rule_engine import (
@@ -46,7 +51,7 @@ def select_case():
     try:
         choice = int(input("\nSelect case number: ")) - 1
         return cases[choice]
-    except:
+    except Exception:
         print("Invalid selection. Defaulting to Case 1.")
         return cases[0]
 
@@ -56,25 +61,40 @@ def select_case():
 # -------------------------------
 def run_bot():
 
-    print("\n====== LexExplain Bail Reasoning Bot ======\n")
+    print("\n====== LexExplain – Bail Decision Justification Bot ======\n")
 
-    # Boundary-protected user query
+    # User query (boundary protected)
     user_query = input("Ask about bail reasoning: ")
 
+    # -------------------------------
+    # Boundary Enforcement
+    # -------------------------------
     if not boundary_check(user_query):
-        print("\n" + boundary_refusal())
+        print("\nREQUEST BLOCKED")
+        print(f"Reason: {boundary_violation_reason(user_query)}")
+        print(boundary_refusal())
         return
 
-    # Case selection
+    # -------------------------------
+    # Case Selection
+    # -------------------------------
     case = select_case()
 
-    # Retrieve related records
+    # -------------------------------
+    # Retrieve Related Records
+    # -------------------------------
     try:
-        accused = next(a for a in accused_profiles if a["case_id"] == case["case_id"])
-        bail_order = next(b for b in bail_orders if b["case_id"] == case["case_id"])
-        evidence_list = [e for e in evidence if e["case_id"] == case["case_id"]]
+        accused = next(
+            a for a in accused_profiles if a["case_id"] == case["case_id"]
+        )
+        bail_order = next(
+            b for b in bail_orders if b["case_id"] == case["case_id"]
+        )
+        evidence_list = [
+            e for e in evidence if e["case_id"] == case["case_id"]
+        ]
     except StopIteration:
-        print("Data mismatch detected for selected case.")
+        print("Data mismatch detected for the selected case.")
         return
 
     # -------------------------------
@@ -84,6 +104,8 @@ def run_bot():
     risk_analysis = analyze_risks(accused)
     bail_analysis = analyze_bail_order(bail_order)
     evidence_analysis = analyze_evidence(evidence_list)
+
+    # (Analyses are intentionally not printed — they support explainability)
 
     # -------------------------------
     # EXPLANATION GENERATION
