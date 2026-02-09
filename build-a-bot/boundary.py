@@ -8,13 +8,12 @@ Purpose:
 - Provide explainable and transparent refusals
 """
 
-# Prohibited intents / phrases
+# Explicit prohibited phrases (strong signals)
 PROHIBITED_KEYWORDS = [
     # Outcome prediction
     "will the accused get bail",
     "will the accused get bailed",
     "will i get bail",
-    "will get bail",
     "chances of bail",
     "predict",
     "outcome",
@@ -49,9 +48,19 @@ def boundary_check(user_query: str) -> bool:
     """
     query = user_query.lower().strip()
 
+    # 1️⃣ Explicit phrase blocking
     for phrase in PROHIBITED_KEYWORDS:
         if phrase in query:
             return False
+
+    # 2️⃣ Intent-based prediction blocking
+    # Example: "will i get bail", "will i get bail in this case?"
+    if "will" in query and "bail" in query:
+        return False
+
+    # 3️⃣ Advice-style intent blocking
+    if ("should" in query or "advice" in query) and "bail" in query:
+        return False
 
     return True
 
